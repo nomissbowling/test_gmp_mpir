@@ -1,6 +1,6 @@
 [package]
 name = "test_gmp_mpir"
-version = "0.0.1" # change with html_root_url in main.rs
+version = "0.0.2" # change with html_root_url in main.rs
 edition = "2021"
 authors = ["nomissbowling <nomissbowling@yahoo.co.jp>"]
 
@@ -20,9 +20,11 @@ readme = "README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-mpir = { version = ">=0.1.2" }
+mpir = { version = ">=0.1.6" }
 
 home = { version = "=0.5.5" } # cc(1.0.79)/bindgen(0.65.1) requires home(0.5.5)
+
+once_cell = { version = "=1.20.3" } # skip 1.21.0
 
 [build-dependencies]
 cc = "=1.0.79"

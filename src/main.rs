@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.0.1")]
+#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.0.2")]
 //! test_gmp_mpir
 //!
 //! # Requirements
@@ -33,6 +33,22 @@ use std::os::raw::{c_char, c_int, c_double, c_void};
 let c = c"abc"; // new version
 unsafe { let c = CStr::from_ptr(0 as *const i8); }
 let cs = CString::new("abc");
+
+- [mpz ...](https://gmplib.org/manual/Integer-Functions)
+- [mpz cmp ...](https://gmplib.org/manual/Integer-Comparisons)
+- [mpz fac_ui fib_ui ...](https://gmplib.org/manual/Number-Theoretic-Functions)
+- [mpz sqrt root ...](https://gmplib.org/manual/Integer-Roots)
+- [mpz add sub mul addmul ...](https://gmplib.org/manual/Integer-Arithmetic)
+- [mpz *div mod ...](https://gmplib.org/manual/Integer-Division)
+- [mpz pow ...](https://gmplib.org/manual/Integer-Exponentiation)
+
+- [mpf ...](https://gmplib.org/manual/Rational-Number-Functions)
+- [mpf cmp ...](https://gmplib.org/manual/Float-Comparison)
+- [mpf sqrt add sub mul div pow ...](https://gmplib.org/manual/Float-Arithmetic)
+
+- [mpq ...](https://gmplib.org/manual/Rational-Number-Functions)
+- [mpq cmp ...](https://gmplib.org/manual/Comparing-Rationals)
+- [mpq add sub mul div inv ...](https://gmplib.org/manual/Rational-Arithmetic)
 */
 
 // use std::env;
@@ -200,11 +216,13 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   let f = &mut mpf_s::init();
   let g = &mut mpf_s::init();
 /*
+  // ***must NOT call*** auto called clear
   a.clear(); mpz_init(a);
   f.clear(); mpf_init(f);
   g.clear(); mpf_init(g);
 */
 /*
+  // ***must NOT call*** auto called clear
   mpz_clears(&mut vec![a]); mpz_init(a);
   mpf_clears(&mut vec![g, f]); mpf_init(f); mpf_init(g);
 */
@@ -217,11 +235,16 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   println!("f {}", f.set_z(a).div(g.set_str("1.0e+11", 10)));
   println!("f {}", mpf_get_fmtstr(f, 10, 22)?);
 
+  // mpz fac_ui (to be operator)
+  (0..=20).into_iter().for_each(|n: usize| {
+    let t = &mut mpz_s::fac_ui(n as ui_t);
+    println!("{}! = {}", n, t);
+  });
+
   // mpz fact (to be operator)
   (0..=20).into_iter().for_each(|n: usize| {
     let t = &mut mpz_s::fact(n as ui_t);
     println!("{}! = {}", n, t);
-    t.clear();
   });
 
   // mpz fact (to be operator) cached
@@ -229,8 +252,38 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   (0..=20).into_iter().for_each(|n: usize| {
     let t = &mut mpz_s::fact_cached(n as ui_t, m);
     println!("{}! = {}", n, t);
-    t.clear();
   });
+
+  // mpf prec (c style)
+  println!("prec {}", mpf_get_default_prec()); // may be 64
+  mpf_set_default_prec(100); // 100 set to 128 bits (step by 2**n)
+  println!("prec {}", mpf_get_default_prec()); // may be 128 (about 38 digits)
+  let digits = mpf_s::calc_digits_from_bits(128);
+  println!("digits {}", digits); // may be 38
+
+  // mpf calc napier (to be operator)
+  let digits = 40;
+  mpf_set_default_prec(mpf_s::calc_bits_from_digits(digits));
+  let e = &mut mpf_s::calc_napier(&mut mpf_s::init_set_d(1.0), digits);
+  assert_eq!(format!("{}", e),
+    "0.27182818284590452354e+1");
+  assert_eq!(mpf_get_fmtstr(e, 10, digits).expect("fmtstr"),
+    "0.2718281828459045235360287471352662497757e+1");
+
+  let digits = 150;
+  mpf_set_default_prec(mpf_s::calc_bits_from_digits(digits));
+  let e = &mut mpf_s::calc_napier(&mut mpf_s::init_set_d(1.0), digits);
+  assert_eq!(format!("{}", e),
+    "0.27182818284590452354e+1");
+  assert_eq!(mpf_get_fmtstr(e, 10, digits).expect("fmtstr"),
+    "0.271828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741359662904357290033429526e+1");
+/*
+  2.
+  7182818284 5904523536 0287471352 6624977572 4709369995
+  9574966967 6277240766 3035354759 4571382178 5251664274
+  2746639193 2003059921 8174135966 2904357290 0334295260
+  ...
+*/
 
   println!("done");
   Ok(())
