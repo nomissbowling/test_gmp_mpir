@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.0.2")]
+#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.0.3")]
 //! test_gmp_mpir
 //!
 //! # Requirements
@@ -233,7 +233,7 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
   // mpf (to be operator)
   println!("f {}", f.set_z(a).div(g.set_str("1.0e+11", 10)));
-  println!("f {}", mpf_get_fmtstr(f, 10, 22)?);
+  println!("f {}", f.fmtstr(10, 22));
 
   // mpz fac_ui (to be operator)
   (0..=20).into_iter().for_each(|n: usize| {
@@ -263,19 +263,19 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
   // mpf calc napier (to be operator)
   let digits = 40;
-  mpf_set_default_prec(mpf_s::calc_bits_from_digits(digits));
+  mpf_set_default_prec(mpf_s::calc_bits_from_digits(digits + 3));
   let e = &mut mpf_s::calc_napier(&mut mpf_s::init_set_d(1.0), digits);
   assert_eq!(format!("{}", e),
     "0.27182818284590452354e+1");
-  assert_eq!(mpf_get_fmtstr(e, 10, digits).expect("fmtstr"),
+  assert_eq!(e.fmtstr(10, digits),
     "0.2718281828459045235360287471352662497757e+1");
 
   let digits = 150;
-  mpf_set_default_prec(mpf_s::calc_bits_from_digits(digits));
+  mpf_set_default_prec(mpf_s::calc_bits_from_digits(digits + 3));
   let e = &mut mpf_s::calc_napier(&mut mpf_s::init_set_d(1.0), digits);
   assert_eq!(format!("{}", e),
     "0.27182818284590452354e+1");
-  assert_eq!(mpf_get_fmtstr(e, 10, digits).expect("fmtstr"),
+  assert_eq!(e.fmtstr(10, digits),
     "0.271828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741359662904357290033429526e+1");
 /*
   2.
