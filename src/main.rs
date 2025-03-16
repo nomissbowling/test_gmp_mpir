@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.0.3")]
+#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.2.0")]
 //! test_gmp_mpir
 //!
 //! # Requirements
