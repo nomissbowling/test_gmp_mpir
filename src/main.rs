@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.2.0")]
+#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.2.3")]
 //! test_gmp_mpir
 //!
 //! # Requirements
@@ -42,9 +42,16 @@ let cs = CString::new("abc");
 - [mpz *div mod ...](https://gmplib.org/manual/Integer-Division)
 - [mpz pow ...](https://gmplib.org/manual/Integer-Exponentiation)
 
+- [mpz logic bit](https://gmplib.org/manual/Integer-Logic-and-Bit-Fiddling)
+- [mpz misc](https://gmplib.org/manual/Miscellaneous-Integer-Functions)
+- [mpz special](https://gmplib.org/manual/Integer-Special-Functions)
+- [mpz random](https://gmplib.org/manual/Integer-Random-Numbers)
+
 - [mpf ...](https://gmplib.org/manual/Rational-Number-Functions)
 - [mpf cmp ...](https://gmplib.org/manual/Float-Comparison)
 - [mpf sqrt add sub mul div pow ...](https://gmplib.org/manual/Float-Arithmetic)
+
+- [mpf misc](https://gmplib.org/manual/Miscellaneous-Float-Functions)
 
 - [mpq ...](https://gmplib.org/manual/Rational-Number-Functions)
 - [mpq cmp ...](https://gmplib.org/manual/Comparing-Rationals)
@@ -236,20 +243,20 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   println!("f {}", f.fmtstr(10, 22));
 
   // mpz fac_ui (to be operator)
-  (0..=20).into_iter().for_each(|n: usize| {
+  (0..=20).for_each(|n: usize| {
     let t = &mut mpz_s::fac_ui(n as ui_t);
     println!("{}! = {}", n, t);
   });
 
   // mpz fact (to be operator)
-  (0..=20).into_iter().for_each(|n: usize| {
+  (0..=20).for_each(|n: usize| {
     let t = &mut mpz_s::fact(n as ui_t);
     println!("{}! = {}", n, t);
   });
 
   // mpz fact (to be operator) cached
   let m = &mut HashMap::<ui_t, mpz_s>::new();
-  (0..=20).into_iter().for_each(|n: usize| {
+  (0..=20).for_each(|n: usize| {
     let t = &mut mpz_s::fact_cached(n as ui_t, m);
     println!("{}! = {}", n, t);
   });
