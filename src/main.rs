@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.2.3")]
+#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.2.5")]
 //! test_gmp_mpir
 //!
 //! # Requirements
@@ -73,6 +73,32 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   println!("cargo:rustc-link-lib=dylib={}", "libgmp-10");
   println!("cargo:rustc-link-lib=dylib={}", "mpir");
 */
+
+  // mpz (dump)
+  let a = &mut mpz_s::init_set_si(!0); // (ffffffffffffffff) 0000000000000001
+  gmp_printf("a [%Zx]\n", a); // -1
+  println!("dbg a {:?}\nfmt a {}", a, a); // 1, -1 () -1
+
+  let a = &mut mpz_s::init_set_ui(!0); // 00000000ffffffff
+  gmp_printf("a [%Zx]\n", a); // ffffffff
+  println!("dbg a {:?}\nfmt a {}", a, a); // 1, 1 () 4294967295
+
+  a.add_ui(1); // 0000000100000000 0000000000000000
+  gmp_printf("a [%Zx]\n", a); // 100000000
+  println!("dbg a {:?}\nfmt a {}", a, a); // 2, 1 () () 4294967296
+
+  let b = &mut a.com(); // (fffffffeffffffff) 0000000100000001 0000000000000000
+  gmp_printf("b [%Zx]\n", b); // -100000001
+  println!("dbg b {:?}\nfmt b {}", b, b); // 2, -1 () () -4294967297
+
+  a.mul_ui(!0); // ffffffff00000000 0000000000000000
+  gmp_printf("a [%Zx]\n", a); // ffffffff00000000
+  println!("dbg a {:?}\nfmt a {}", a, a); // 2, 1 () () 18446744069414584320
+
+  let b = &mut mpz_s::init_set_ui(0); // 0000000000000000
+  let a = &mut b.com(); // (ffffffffffffffff) 0000000000000001
+  gmp_printf("a [%Zx]\n", a); // -1
+  println!("dbg a {:?}\nfmt a {}", a, a); // 1, -1 () -1
 
   // mpz (c style)
   let a = &mut mpz_s::new();
@@ -291,6 +317,21 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   2746639193 2003059921 8174135966 2904357290 0334295260
   ...
 */
+
+  // mpf calc pi euler (to be operator)
+  minimum::calc_pi_euler_test();
+
+  // mpf calc pi gauss legendre (to be operator)
+  minimum::calc_pi_gauss_legendre_test();
+
+  let lc = &mut randstate_s::init_default();
+  let t = 0; // from time
+  lc.seed_ui(t);
+  let r = &mut mpz_s::urandomb(lc, 100);
+  println!("{}", r); // r.hexstr()
+
+  // ept
+  minimum::ept_test();
 
   println!("done");
   Ok(())
