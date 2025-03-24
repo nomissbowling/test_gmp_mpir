@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.2.5")]
+#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.2.6")]
 //! test_gmp_mpir
 //!
 //! # Requirements
@@ -318,20 +318,20 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   ...
 */
 
+  // mpf calc pi gauss legendre (to be operator)
+  minimum::calc_pi_gauss_legendre_test();
+
   // mpf calc pi euler (to be operator)
   minimum::calc_pi_euler_test();
 
-  // mpf calc pi gauss legendre (to be operator)
-  minimum::calc_pi_gauss_legendre_test();
+  // ept
+  minimum::ept_test();
 
   let lc = &mut randstate_s::init_default();
   let t = 0; // from time
   lc.seed_ui(t);
   let r = &mut mpz_s::urandomb(lc, 100);
   println!("{}", r); // r.hexstr()
-
-  // ept
-  minimum::ept_test();
 
   println!("done");
   Ok(())
