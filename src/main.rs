@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.2.6")]
+#![doc(html_root_url = "https://docs.rs/test_gmp_mpir/0.3.4")]
 //! test_gmp_mpir
 //!
 //! # Requirements
@@ -74,12 +74,16 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   println!("cargo:rustc-link-lib=dylib={}", "mpir");
 */
 
+  // to avoid size difference of unsigned long and unsigned long long
+  let zinv64 = (!0 as i32) as si_t; // ffffffffffffffff
+  let zinv32 = (!0 as u32) as ui_t; // 00000000ffffffff
+
   // mpz (dump)
-  let a = &mut mpz_s::init_set_si(!0); // (ffffffffffffffff) 0000000000000001
+  let a = &mpz_s::init_set_si(zinv64); // (ffffffffffffffff) 0000000000000001
   gmp_printf("a [%Zx]\n", a); // -1
   println!("dbg a {:?}\nfmt a {}", a, a); // 1, -1 () -1
 
-  let a = &mut mpz_s::init_set_ui(!0); // 00000000ffffffff
+  let a = &mut mpz_s::init_set_ui(zinv32); // 00000000ffffffff
   gmp_printf("a [%Zx]\n", a); // ffffffff
   println!("dbg a {:?}\nfmt a {}", a, a); // 1, 1 () 4294967295
 
@@ -87,16 +91,16 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   gmp_printf("a [%Zx]\n", a); // 100000000
   println!("dbg a {:?}\nfmt a {}", a, a); // 2, 1 () () 4294967296
 
-  let b = &mut a.com(); // (fffffffeffffffff) 0000000100000001 0000000000000000
+  let b = &a.com(); // (fffffffeffffffff) 0000000100000001 0000000000000000
   gmp_printf("b [%Zx]\n", b); // -100000001
   println!("dbg b {:?}\nfmt b {}", b, b); // 2, -1 () () -4294967297
 
-  a.mul_ui(!0); // ffffffff00000000 0000000000000000
+  a.mul_ui(zinv32); // ffffffff00000000 0000000000000000
   gmp_printf("a [%Zx]\n", a); // ffffffff00000000
   println!("dbg a {:?}\nfmt a {}", a, a); // 2, 1 () () 18446744069414584320
 
-  let b = &mut mpz_s::init_set_ui(0); // 0000000000000000
-  let a = &mut b.com(); // (ffffffffffffffff) 0000000000000001
+  let b = &mpz_s::init_set_ui(0); // 0000000000000000
+  let a = &b.com(); // (ffffffffffffffff) 0000000000000001
   gmp_printf("a [%Zx]\n", a); // -1
   println!("dbg a {:?}\nfmt a {}", a, a); // 1, -1 () -1
 
@@ -270,20 +274,20 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
   // mpz fac_ui (to be operator)
   (0..=20).for_each(|n: usize| {
-    let t = &mut mpz_s::fac_ui(n as ui_t);
+    let t = &mpz_s::fac_ui(n as ui_t);
     println!("{}! = {}", n, t);
   });
 
   // mpz fact (to be operator)
   (0..=20).for_each(|n: usize| {
-    let t = &mut mpz_s::fact(n as ui_t);
+    let t = &mpz_s::fact(n as ui_t);
     println!("{}! = {}", n, t);
   });
 
   // mpz fact (to be operator) cached
   let m = &mut HashMap::<ui_t, mpz_s>::new();
   (0..=20).for_each(|n: usize| {
-    let t = &mut mpz_s::fact_cached(n as ui_t, m);
+    let t = &mpz_s::fact_cached(n as ui_t, m);
     println!("{}! = {}", n, t);
   });
 
@@ -297,7 +301,7 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   // mpf calc napier (to be operator)
   let digits = 40;
   mpf_set_default_prec(mpf_s::calc_bits_from_digits(digits + 3));
-  let e = &mut mpf_s::calc_napier(&mut mpf_s::init_set_d(1.0), digits);
+  let e = &mpf_s::calc_napier(&mpf_s::init_set_d(1.0), digits);
   assert_eq!(format!("{}", e),
     "0.27182818284590452354e+1");
   assert_eq!(e.fmtstr(10, digits),
@@ -305,7 +309,7 @@ pub fn main() -> Result<(), Box<dyn Error>> {
 
   let digits = 150;
   mpf_set_default_prec(mpf_s::calc_bits_from_digits(digits + 3));
-  let e = &mut mpf_s::calc_napier(&mut mpf_s::init_set_d(1.0), digits);
+  let e = &mpf_s::calc_napier(&mpf_s::init_set_d(1.0), digits);
   assert_eq!(format!("{}", e),
     "0.27182818284590452354e+1");
   assert_eq!(e.fmtstr(10, digits),
@@ -324,14 +328,23 @@ pub fn main() -> Result<(), Box<dyn Error>> {
   // mpf calc pi euler (to be operator)
   minimum::calc_pi_euler_test();
 
+  // mpf calc pi leibniz (to be operator)
+  minimum::calc_pi_leibniz_test();
+
+  // mpf calc pi machin (to be operator)
+  minimum::calc_pi_machin_test();
+
+  // mpf calc pi takano (to be operator)
+  minimum::calc_pi_takano_test();
+
   // ept
   minimum::ept_test();
 
   let lc = &mut randstate_s::init_default();
   let t = 0; // from time
   lc.seed_ui(t);
-  let r = &mut mpz_s::urandomb(lc, 100);
-  println!("{}", r); // r.hexstr()
+  let r = &mpz_s::urandomb(lc, 100);
+  println!("{}", r.hexstr());
 
   println!("done");
   Ok(())
